@@ -9,8 +9,6 @@
 #ifndef _AST_H_
 #define _AST_H_
 
-#define MAX_VAR_LEN 64
-
 /**
  * @brief Var data format - comparison is done by `id` field rather than
  *        `name` for variable name shadowing

@@ -13,6 +13,7 @@
 #include <util.h>
 
 #include "ast.h"
+#include "lexer.h"
 
 static unsigned int _var_id = 0;
 
@@ -36,24 +37,24 @@ unsigned int new_var_id() {
 var_t *new_var(unsigned int id, const char *name) {
     var_t *res;
     if ((res = malloc(sizeof(var_t))) == NULL)
-        goto cleanup_var;
+        goto cleanup_default;
 
     res->id = id;
 
     size_t nlen;
     MIN(nlen, strlen(name), MAX_VAR_LEN);
     if ((res->name = malloc(nlen + 1)) == NULL)
-        goto cleanup_name;
+        goto cleanup_var;
 
     strncpy(res->name, name, nlen);
     res->name[nlen] = '\0';
 
     return res;
 
-cleanup_name:
+cleanup_var:
     free(res);
 
-cleanup_var:
+cleanup_default:
     return NULL;
 }
 

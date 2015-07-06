@@ -6,6 +6,16 @@
  * @author Lars Wander
  */
 
-int main() {
+#include <stdio.h>
+
+#include <lib/dyn_buf.h>
+#include "lexer.h"
+
+int main(int argc, char **argv) {
+    dyn_buf_t *buf = new_dyn_buf();
+    int res;
+    if ((res = lex(argv[1], buf)) < 0)
+        printf("%d\n", res);
+
     return 0;
 }

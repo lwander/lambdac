@@ -4,21 +4,22 @@ CXXFLAGS=-I$(IDIR)/ -c -Wall -Wpedantic -Werror -std=c11 -m32 -g
 
 OBJ_DIR=obj
 SRC_DIR=src
-SUB_DIRS=libs test
-ALL_DIRS=$(SUB_DIRS:%=$(OBJ_DIR)/%)
+TEST_DIR=test
+SRC_SUB_DIRS=lib
+ALL_DIRS=$(SRC_SUB_DIRS:%=$(OBJ_DIR)/%)
 
 EXECUTABLE=lcc
 
-TEST_EXECUTABLE=test_lcc
+TEST_EXECUTABLE=lcc_test
 
 # Files needed only by LLC executable
-LCC_SRCS=main.c ast.c
+LCC_SRCS=main.c ast.c lexer.c parser.c 
 
 # Files required by unit tests & LCC executable
-# SHRD_SRCS=libs/hashtable.c
+SHRD_SRCS=lib/dyn_buf.c lib/hashtable.c
 
 # Files required only by unit tests
-# TEST_SRCS=test/lcc_test.c
+TEST_SRCS=lcc_test.c test_hashtable.c
 
 SHRD_OBJS=$(SHRD_SRCS:%.c=$(OBJ_DIR)/%.o)
 
@@ -39,6 +40,9 @@ $(EXECUTABLE): $(SHRD_OBJS) $(LCC_OBJS)
 	$(CXX) $^ -o $(EXECUTABLE) 
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CXX) $(CXXFLAGS) $< -o $@
+
+$(OBJ_DIR)/%.o: $(TEST_DIR)/%.c
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 dirs: 
