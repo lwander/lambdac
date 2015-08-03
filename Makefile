@@ -10,16 +10,16 @@ ALL_DIRS=$(SRC_SUB_DIRS:%=$(OBJ_DIR)/%)
 
 EXECUTABLE=lcc
 
-TEST_EXECUTABLE=lcc_test
+TEST_EXECUTABLE=test_lcc
 
 # Files needed only by LLC executable
 LCC_SRCS=main.c ast.c lexer.c parser.c 
 
 # Files required by unit tests & LCC executable
-SHRD_SRCS=lib/dyn_buf.c lib/hashtable.c
+SHRD_SRCS=lib/dyn_buf.c lib/hashtable.c err.c
 
 # Files required only by unit tests
-TEST_SRCS=lcc_test.c test_hashtable.c
+TEST_SRCS=test_lcc.c test_hashtable.c
 
 SHRD_OBJS=$(SHRD_SRCS:%.c=$(OBJ_DIR)/%.o)
 

@@ -78,6 +78,20 @@ int test_hashtable_hard() {
         assert(htable_lookup(ht, key, &v) < 0);
     }
 
+    /*  Reinsert even entries */
+    for (int i = 0; i < HARD_ITERS; i += 2) {
+        sprintf(key, "%d", i);
+        assert(htable_insert(ht, key, i * 2) >= 0);
+    }
+
+    /* Ensure it was stuffed correctly ... again */
+    for (int i = 0; i < HARD_ITERS; i++) {
+        sprintf(key, "%d", i);
+        int v;
+        assert(htable_lookup(ht, key, &v) >= 0);
+        assert(v == i * 2);
+    }
+
     htable_free(ht, NULL);
     return 0;
 }

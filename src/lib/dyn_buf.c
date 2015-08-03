@@ -18,7 +18,7 @@
 /**
  * @brief Creates a new dynamic buffer
  */
-dyn_buf_t *new_dyn_buf() {
+dyn_buf_t *dyn_buf_new() {
     dyn_buf_t *res;
     if ((res = calloc(1, sizeof(dyn_buf_t))) == NULL)
         goto cleanup_default;
@@ -114,7 +114,7 @@ int dyn_buf_at(dyn_buf_t *dyn, int ind, void **elem) {
  * @param free_elem A custom function for deleting the dyn_buf elements.
  *        NULL if not needed
  */
-void free_dyn_buf(dyn_buf_t *dyn, void (*free_elem)(void *)) {
+void dyn_buf_free(dyn_buf_t *dyn, void (*free_elem)(void *)) {
     if (free_elem != NULL)
         for (int i = 0; i < dyn->cur_size; i++)
             (*free_elem)(dyn->buf[i]);

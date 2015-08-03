@@ -12,7 +12,7 @@
 #include "lexer.h"
 
 int main(int argc, char **argv) {
-    dyn_buf_t *buf = new_dyn_buf();
+    dyn_buf_t *buf = dyn_buf_new();
     int res;
     if ((res = lex(argv[1], buf)) < 0)
         printf("%d\n", res);

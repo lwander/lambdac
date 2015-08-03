@@ -16,10 +16,10 @@
 struct _dyn_buf;
 typedef struct _dyn_buf dyn_buf_t;
 
-dyn_buf_t *new_dyn_buf();
+dyn_buf_t *dyn_buf_new();
 
 int dyn_buf_push(dyn_buf_t *buf, void *elem);
 int dyn_buf_at(dyn_buf_t *buf, int ind, void **elem);
-void free_dyn_buf(dyn_buf_t *dyn, void (*free_elem)(void *));
+void dyn_buf_free(dyn_buf_t *dyn, void (*free_elem)(void *));
 
 #endif /* _DYN_BUF_H_ */
