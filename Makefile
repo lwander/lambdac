@@ -1,6 +1,7 @@
 IDIR=inc
 CXX=gcc
-CXXFLAGS=-I$(IDIR)/ -c -Wall -Wpedantic -Werror -std=c11 -m32 -g
+CXXFLAGS=-I$(IDIR)/ -c -Wall -Wpedantic -Werror -std=c11 -g
+SHAREDFLAGS=-m32
 
 OBJ_DIR=obj
 SRC_DIR=src
@@ -34,16 +35,16 @@ all: dirs $(EXECUTABLE)
 test: dirs $(TEST_EXECUTABLE)
 	
 $(TEST_EXECUTABLE): $(SHRD_OBJS) $(TEST_OBJS)
-	$(CXX) $^ -o $(TEST_EXECUTABLE)
+	$(CXX) $^ -o $(TEST_EXECUTABLE) $(SHAREDFLAGS)
 
 $(EXECUTABLE): $(SHRD_OBJS) $(LCC_OBJS)
-	$(CXX) $^ -o $(EXECUTABLE) 
+	$(CXX) $^ -o $(EXECUTABLE) $(SHAREDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CXX) $(CXXFLAGS) $< -o $@
+	$(CXX) $(CXXFLAGS) $(SHAREDFLAGS) $< -o $@
 
 $(OBJ_DIR)/%.o: $(TEST_DIR)/%.c
-	$(CXX) $(CXXFLAGS) $< -o $@
+	$(CXX) $(CXXFLAGS) $(SHAREDFLAGS) $< -o $@
 
 dirs: 
 	-mkdir -p $(OBJ_DIR) $(ALL_DIRS)

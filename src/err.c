@@ -6,6 +6,8 @@
  * @author Lars Wander
  */
 
+#include <err.h>
+
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -34,7 +36,7 @@ void err_report(const char *msg, int err, ...) {
     vsnprintf(buf, sizeof(buf), err_wrap, ap);
     va_end(ap);
 
-    fprintf(stderr, buf);
+    fputs(buf, stderr);
 }
 
 /**

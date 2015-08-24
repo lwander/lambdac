@@ -18,18 +18,29 @@
 
 MAKE_VOID_FREE(free_token)
 
+/**
+ * @brief Parse expression 
+ *        <expression> ::= <var> | <lambda> | (<expression> <expression>)
+ *
+ * @param tokens Token buffer being parsed
+ * @param cur Location of the start of the expression token
+ * @param vars Variable context
+ *
+ * @return 0 on success, ERR_* otherwise
+ */
 int _parse_exp(dyn_buf_t *tokens, int cur, htable_t *vars) {
     return 0;
 }
 
 /**
  * @brief Attempt to parse a variable token
+ *        <var> ::= [a-zA-Z0-9]*
  *
  * @param tokens The current token buffer being parsed
- * @param cur location of the var token
+ * @param cur Location of the var token
  * @param vars Variable context (existing variables)
  * @param decl Is this a new variable being declared?
- * @param out pointer to where the result should be stored (cannot be NULL)
+ * @param out Pointer to where the result should be stored (cannot be NULL)
  *
  * @return ERR_* on failure, 0 if no variable is being overwritten, otherwise
  *         a positive integer corresponding to the overrwritten variables ID
@@ -67,8 +78,8 @@ int _parse_var(dyn_buf_t *tokens, int cur, htable_t *vars,
         return ERR_MEM_ALLOC;
 
     if ((res = htable_insert(vars, read.ident, new_id)) < 0)
+        goto cleanup_var;
 
-    
     /* This binding site shadows a previous one, so store the id of 
      * the previous binding site be restored when we leave this context */
     res = 0;
@@ -77,12 +88,24 @@ int _parse_var(dyn_buf_t *tokens, int cur, htable_t *vars,
         assert(id > 0);
     }
 
+    return res;
+
 cleanup_var:
     free_var(*out);
 
     return res;
 }
 
+/**
+ * @brief Parse a lambda function construct
+ *        <lambda> ::= (\<var>.<expression>)
+ *
+ * @param tokens Buffer of tokens being parsed
+ * @param cur Index of token we expect lambda to start at
+ * @param vars Variable context
+ *
+ * @return 0 on success, ERR_* otherwise
+ */
 int _parse_lambda(dyn_buf_t *tokens, int cur, htable_t *vars) {
     token_t read;
     int res;
