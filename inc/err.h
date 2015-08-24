@@ -12,6 +12,8 @@
 #include <assert.h>
 
 void err_set_msg(const char *msg);
+void err_report(const char *msg, int err, ...);
+const char *err_to_string(int err);
 
 #define ERR_OOB (-3)
 
