@@ -17,5 +17,7 @@ int main(int argc, char **argv) {
     if ((res = lex(argv[1], buf)) < 0)
         printf("%d\n", res);
 
+    format_tokens(buf);
+
     return 0;
 }

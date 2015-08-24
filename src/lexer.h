@@ -13,7 +13,6 @@
 
 #define MAX_VAR_LEN 64
 
-
 /**
  * @brief All types of tokens enumerated
  */
@@ -31,12 +30,13 @@ typedef enum _token_e {
 typedef struct _token {
     /* Represents type of the token */
     token_e type;
-    
+
     /* NULL whenever non-VAR type token */
     char *ident;
 } token_t;
 
 int lex(const char *path, dyn_buf_t *buf);
+void format_tokens(dyn_buf_t *buf);
 void free_token(token_t *token);
 
 #endif /* _LEXER_H_ */

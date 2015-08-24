@@ -53,6 +53,51 @@ cleanup_default:
     return NULL;
 }
 
+void _format_token(token_t *token) {
+    switch (token->type) {
+        case (T_LPAREN):
+            printf("(");
+            break;
+        case (T_RPAREN):
+            printf(")");
+            break;
+        case (T_BSLASH):
+            printf("\\");
+            break;
+        case (T_DOT):
+            printf(".");
+            break;
+        case (T_VAR):
+            if (token->ident == NULL) {
+                err_report("Variable token type without name\n", ERR_INP); 
+                exit(-2);
+            }
+            printf("%s", token->ident);
+            break;
+        default:
+            break;
+    }
+}
+
+/**
+ * @brief Print input tokens to stdout for testing purposes
+ *
+ * @param buf Buffer of input tokens to be printed
+ */
+void format_tokens(dyn_buf_t *buf) {
+    int elems = dyn_buf_len(buf);
+    int i;
+    token_t *token;
+    for (i = 0; i < elems; i++) {
+        int res;
+        if ((res = dyn_buf_at(buf, i, (void **)&token)) < 0)
+            err_report("dyn_buf_t lookup failed", res);
+        _format_token(token);
+    }
+    printf("\n");
+}
+
+
 /**
  * @brief Free input token
  *

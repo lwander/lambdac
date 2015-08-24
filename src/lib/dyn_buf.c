@@ -38,6 +38,13 @@ cleanup_default:
 }
 
 /**
+ * @brief get the number of elements in the buffer 
+ */
+int dyn_buf_len(dyn_buf_t *dyn) {
+    return dyn->cur_size;
+}
+
+/**
  * @brief Double the dynamic buffer size & copy into a new buffer
  *
  * @param dyn The dynamic buffer to be grown
@@ -100,7 +107,7 @@ int dyn_buf_at(dyn_buf_t *dyn, int ind, void **elem) {
     if (dyn == NULL || elem == NULL)
         return ERR_INP;
 
-    if (dyn->cur_size >= ind)
+    if (dyn->cur_size <= ind)
         return ERR_OOB;
 
     *elem = dyn->buf[ind];
