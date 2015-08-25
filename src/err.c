@@ -32,7 +32,7 @@ void err_report(const char *msg, int err, ...) {
     char buf[256];
 
     va_start(ap, err);
-    sprintf(err_wrap, "%s : %s", err_to_string(err), msg);
+    sprintf(err_wrap, "%s : %s\n", err_to_string(err), msg);
     vsnprintf(buf, sizeof(buf), err_wrap, ap);
     va_end(ap);
 

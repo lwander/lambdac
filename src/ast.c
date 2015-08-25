@@ -15,7 +15,7 @@
 #include "ast.h"
 #include "lexer.h"
 
-static unsigned int _var_id = 0;
+static unsigned int _var_id = 1;
 
 /**
  * @brief Get a fresh var id for alpha equivalence
@@ -181,3 +181,65 @@ void free_expr(expr_t *expr) {
 
     free(expr);
 }
+
+void _format_expr(expr_t *expr);
+    
+/**
+ * @brief Format input variable 
+ */
+void _format_var(var_t *var) {
+    printf("( [var] \"%s\".%d )", var->name, var->id);
+}
+
+/**
+ * @brief Format input lambda 
+ */
+void _format_lam(lam_t *lam) {
+    printf("( [lam] \\");
+    _format_var(lam->var);
+    printf(".");
+    _format_expr(lam->body);
+    printf(" )");
+}
+
+/**
+ * @brief Format input application
+ */
+void _format_appl(appl_t *appl) {
+    printf("( [appl] ");
+    _format_expr(appl->f);
+    printf(" ");
+    _format_expr(appl->x);
+    printf(" )");
+}
+
+
+/**
+ * @brief Format input expression 
+ */
+void _format_expr(expr_t *expr) {
+    printf("( [expr] ");
+    switch (expr->type) {
+        case (VAR):
+            _format_var((var_t *)expr->data);
+            break;
+        case (LAMBDA):
+            _format_lam((lam_t *)expr->data);
+            break;
+        case (APPL):
+            _format_appl((appl_t *)expr->data);
+            break;
+        default:
+            printf("??? %d", expr->type);
+    }
+    printf(" )");
+}
+
+/**
+ * @brief Format input AST
+ */
+void format_ast(expr_t *expr) {
+    _format_expr(expr);
+    printf("\n");
+}
+

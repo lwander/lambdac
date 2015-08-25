@@ -9,15 +9,18 @@
 #include <stdio.h>
 
 #include <lib/dyn_buf.h>
-#include "lexer.h"
+#include <err.h>
+#include "parser.h"
+#include "ast.h"
 
 int main(int argc, char **argv) {
-    dyn_buf_t *buf = dyn_buf_new();
     int res;
-    if ((res = lex(argv[1], buf)) < 0)
-        printf("%d\n", res);
-
-    format_tokens(buf);
+    expr_t *ast;
+    if ((res = parse(argv[1], &ast)) < 0)
+        printf("%s\n", err_to_string(res));
+    else {
+        format_ast(ast);
+    }
 
     return 0;
 }

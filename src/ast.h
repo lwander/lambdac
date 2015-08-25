@@ -68,5 +68,6 @@ void free_var(var_t *var);
 void free_expr(expr_t *expr);
 void free_lam(lam_t *lam);
 void free_appl(appl_t *appl);
+void format_ast(expr_t *expr);
 
 #endif /* _AST_H_ */

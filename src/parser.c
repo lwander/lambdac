@@ -21,6 +21,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
+#include <stdio.h>
 
 MAKE_VOID_FREE(free_token)
 int _parse_expr(dyn_buf_t *tokens, int *cur, htable_t *vars, expr_t **out);
@@ -39,16 +40,16 @@ int _parse_expr(dyn_buf_t *tokens, int *cur, htable_t *vars, expr_t **out);
 int _parse_verify_token(dyn_buf_t *tokens, int *cur, token_e expected,
         token_t *out) {
     int res;
-    token_t read;
-    if ((res = dyn_buf_at(tokens, *cur, (void *)&read)) < 0)
+    token_t *read;
+    if ((res = dyn_buf_at(tokens, *cur, (void **)&read)) < 0)
         return res;
 
-    if (read.type != expected)
+    if (read->type != expected)
         return ERR_BAD_PARSE;
 
     (*cur)++;
     if (out != NULL)
-        memcpy(out, &read, sizeof(token_t));
+        memcpy(out, read, sizeof(token_t));
 
     return 0;
 }
@@ -74,7 +75,7 @@ int _parse_var(dyn_buf_t *tokens, int *cur, htable_t *vars,
 
     token_t read;
     int res;
-    if ((res = _parse_verify_token(tokens, &_cur, T_LPAREN, &read)) < 0)
+    if ((res = _parse_verify_token(tokens, &_cur, T_VAR, &read)) < 0)
         return res;
 
     int id = 0;
@@ -109,7 +110,7 @@ int _parse_var(dyn_buf_t *tokens, int *cur, htable_t *vars,
 
     /* Since we have successfully parsed the variable token, we update the
      * pointer to the token being parsed */
-    *cur = _cur + 1;
+    *cur = _cur;
 
     return res;
 
@@ -138,16 +139,17 @@ int _parse_lambda(dyn_buf_t *tokens, int *cur, htable_t *vars, lam_t **out) {
         return res;
 
     /* \ */
-    if ((res = _parse_verify_token(tokens, &_cur, T_LPAREN, NULL)) < 0)
+    if ((res = _parse_verify_token(tokens, &_cur, T_BSLASH, NULL)) < 0)
         return res;
 
     /* <var> */
     var_t *var;
     if ((res = _parse_var(tokens, &_cur, vars, 1, &var)) < 0)
         return ERR_BAD_PARSE;
+    int old_var_id = res;
 
     /* . */
-    if ((res = _parse_verify_token(tokens, &_cur, T_LPAREN, NULL)) < 0)
+    if ((res = _parse_verify_token(tokens, &_cur, T_DOT, NULL)) < 0)
         goto cleanup_var;
 
     /* <expr> */
@@ -156,7 +158,7 @@ int _parse_lambda(dyn_buf_t *tokens, int *cur, htable_t *vars, lam_t **out) {
         goto cleanup_var;
 
     /* ) */
-    if ((res = _parse_verify_token(tokens, &_cur, T_LPAREN, NULL)) < 0)
+    if ((res = _parse_verify_token(tokens, &_cur, T_RPAREN, NULL)) < 0)
         goto cleanup_expr;
 
     if ((*out = new_lam(var, expr)) == NULL) {
@@ -166,12 +168,26 @@ int _parse_lambda(dyn_buf_t *tokens, int *cur, htable_t *vars, lam_t **out) {
 
     *cur = _cur;
 
+    /* Reset previous binding */
+    if (old_var_id > 0) {
+        htable_insert(vars, var->name, old_var_id);
+    } else {
+        htable_delete(vars, var->name, NULL);
+    }
+
     return 0;
 
 cleanup_expr:
     free_expr(expr);
 
 cleanup_var:
+    /* Reset previous binding */
+    if (old_var_id > 0) {
+        htable_insert(vars, var->name, old_var_id);
+    } else {
+        htable_delete(vars, var->name, NULL);
+    }
+
     free_var(var);
 
     return res;
@@ -296,9 +312,26 @@ int parse(const char *path, expr_t **ast) {
     if ((res = lex(path, tokens)) < 0)
         goto cleanup_tokens;
 
-    htable_t *vars = htable_new();
+    format_tokens(tokens);
 
-//cleanup_vars:
+    htable_t *vars;
+    if ((vars = htable_new()) == NULL)
+        goto cleanup_tokens;
+
+    int cur = 0;
+    if ((res = _parse_expr(tokens, &cur, vars, ast)) < 0)
+        goto cleanup_vars;
+
+    if (cur != dyn_buf_len(tokens)) {
+        res = ERR_BAD_PARSE;
+        err_report("Trailing tokens from %d to %d", res, cur, 
+                dyn_buf_len(tokens));
+        goto cleanup_vars;
+    }
+
+    res = 0;;
+
+cleanup_vars:
     htable_free(vars, NULL);
 
 cleanup_tokens:

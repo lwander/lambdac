@@ -57,7 +57,7 @@ int _dyn_buf_grow(dyn_buf_t *dyn) {
     if ((new_buf = malloc(dyn->max_size * 2 * sizeof(void *))) == NULL)
         return ERR_MEM_ALLOC;
 
-    memcpy(new_buf, dyn->buf, dyn->max_size);
+    memcpy(new_buf, dyn->buf, dyn->max_size * sizeof(void *));
     free(dyn->buf);
     dyn->buf = new_buf;
     dyn->max_size *= 2;
