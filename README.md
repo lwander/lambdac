@@ -13,9 +13,10 @@ interpreter works to get a feel for the dynamics and semantics of the language.
 ```
 <var> ::= [a-zA-Z0-9]*
 <lambda> ::= (\<var>.<expression>)
-<expression> ::= <var> | <lambda> | (<expression> <expression>)
+<application> ::= (<expression> <expression>)
+<expression> ::= <var> | <lambda> | <application>
 ```
 
 What's written above is the [BNF](https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_Form) 
 for our lambda calculus. Essentially, it's saying that our language is composed
-of `var`, `lambda`, and `expression` terms.
+of `var`, `lambda`, `application`,  and `expression` terms.

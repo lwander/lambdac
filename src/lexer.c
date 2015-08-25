@@ -173,8 +173,8 @@ int lex(const char *path, dyn_buf_t *buf) {
 
         if (ident_ind > MAX_VAR_LEN) {
             ident_buf[MAX_VAR_LEN] = '\0';
-            fprintf(stderr, "Identifier \"%s...\" too long\n", ident_buf);
             res = ERR_SEMANTICS;
+            err_report("Identifier \"%s...\" too long\n", res, ident_buf);
             goto cleanup_buf;
         }
 
@@ -203,8 +203,8 @@ int lex(const char *path, dyn_buf_t *buf) {
             case ('\n'):
                 break;
             default:
-                fprintf(stderr, "Character %c not recognized\n", ch);
                 res = ERR_SEMANTICS;
+                err_report("Character %c not recognized\n", res, ch);
                 goto cleanup_buf;
         }
     }

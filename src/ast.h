@@ -64,9 +64,9 @@ var_t *new_var(unsigned int id, const char *name);
 expr_t *new_expr(expr_e type, void *data);
 lam_t *new_lam(var_t *var, expr_t *body);
 appl_t *new_appl(expr_t *f, expr_t *x);
-void free_var();
-void free_expr();
-void free_lam();
-void free_appl();
+void free_var(var_t *var);
+void free_expr(expr_t *expr);
+void free_lam(lam_t *lam);
+void free_appl(appl_t *appl);
 
 #endif /* _AST_H_ */
