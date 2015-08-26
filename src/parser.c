@@ -287,7 +287,7 @@ int _parse_expr(dyn_buf_t *tokens, int *cur, htable_t *vars, expr_t **out) {
         if ((*out = new_expr(APPL, (void *)appl)) == NULL) {
             free_appl(appl);
             return ERR_MEM_ALLOC;
-        } 
+        }
     } else {
         return res;
     }
@@ -324,7 +324,7 @@ int parse(const char *path, expr_t **ast) {
 
     if (cur != dyn_buf_len(tokens)) {
         res = ERR_BAD_PARSE;
-        err_report("Trailing tokens from %d to %d", res, cur, 
+        err_report("Trailing tokens from %d to %d", res, cur,
                 dyn_buf_len(tokens));
         goto cleanup_vars;
     }

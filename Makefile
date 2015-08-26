@@ -14,7 +14,7 @@ EXECUTABLE=lcc
 TEST_EXECUTABLE=test_lcc
 
 # Files needed only by LLC executable
-LCC_SRCS=main.c ast.c lexer.c parser.c 
+LCC_SRCS=main.c ast.c lexer.c parser.c interpreter.c
 
 # Files required by unit tests & LCC executable
 SHRD_SRCS=lib/dyn_buf.c lib/hashtable.c err.c
