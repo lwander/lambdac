@@ -239,6 +239,9 @@ void _format_expr(expr_t *expr) {
  * @brief Format input AST
  */
 void format_ast(expr_t *expr) {
+    if (expr == NULL)
+        return;
+
     _format_expr(expr);
     printf("\n");
 }

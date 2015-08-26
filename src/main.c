@@ -13,6 +13,7 @@
 #include <lib/dyn_buf.h>
 #include <err.h>
 #include "parser.h"
+#include "lexer.h"
 #include "ast.h"
 #include "interpreter.h"
 
@@ -39,19 +40,49 @@ int main(int argc, char **argv) {
         }
     }
 
-    int res;
+    int res = 0;
     if (fname != NULL) {
-        expr_t *ast;
-        if ((res = parse(fname, &ast)) < 0)
-            printf("%s\n", err_to_string(res));
-        else {
-            format_ast(ast);
+        FILE *fp = NULL;
+        if ((fp = fopen(fname, "r")) == NULL) {
+            err_report("Failed to open %s", ERR_FILE_ACTION, fname);
+            return -1;
         }
+
+        dyn_buf_t *tokens;
+        expr_t *ast;
+        if ((res = lex(fp, &tokens, EOF)) < 0) {
+            printf("%s\n", err_to_string(res));
+            goto cleanup_fp;
+        } else if ((res = parse(tokens, &ast)) < 0) {
+            printf("%s\n", err_to_string(res));
+            goto cleanup_tokens;
+        } else {
+#ifdef _DEBUG_
+            format_tokens(tokens);
+            format_ast(ast);
+#endif /* _DEBUG_ */
+
+        }
+
+        free_expr(ast);
+
+cleanup_tokens:
+        dyn_buf_free(tokens, GET_VOID_FREE(free_token));
+
+cleanup_fp:
+        fclose(fp);
     }
 
     if (interp) {
-        while (run_interp() == 0) { }
+        while ((res = run_interp()) >= 0) {
+            /* user exited safely */
+            if (res > 0) {
+                res = 0;
+                break;
+            }
+        }
     }
 
-    return 0;
+
+    return res;
 }

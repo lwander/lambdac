@@ -16,6 +16,8 @@
 
 #include "lexer.h"
 
+MAKE_VOID_FREE(free_token)
+
 /**
  * @brief Pointer to new token struct
  *
@@ -69,7 +71,7 @@ void _format_token(token_t *token) {
             break;
         case (T_VAR):
             if (token->ident == NULL) {
-                err_report("Variable token type without name\n", ERR_INP); 
+                err_report("Variable token type without name\n", ERR_INP);
                 exit(-2);
             }
             printf("%s", token->ident);
@@ -85,6 +87,9 @@ void _format_token(token_t *token) {
  * @param buf Buffer of input tokens to be printed
  */
 void format_tokens(dyn_buf_t *buf) {
+    if (buf == NULL)
+        return;
+
     int elems = dyn_buf_len(buf);
     int i;
     token_t *token;
@@ -143,16 +148,24 @@ cleanup_token:
     return res;
 }
 
-int lex(const char *path, dyn_buf_t *buf) {
+/**
+ * @brief Lex input file into buf, terminating at eof character
+ *
+ * @param fp File pointer (stdin or some file)
+ * @param buf Buffer where output goes
+ * @param eof Terminating character (i.e. \n for interpreter)
+ *
+ * @return 0 on success, ERR_* otherwise
+ */
+int lex(FILE *fp, dyn_buf_t **buf, char eof) {
     int res;
-    if (path == NULL || buf == NULL) {
+    if (fp == NULL || buf == NULL) {
         res = ERR_INP;
         goto cleanup_default;
     }
 
-    FILE *fp;
-    if ((fp = fopen(path, "r")) == NULL) {
-        res = ERR_FILE_ACTION;
+    if ((*buf = dyn_buf_new()) == NULL) {
+        res = ERR_MEM_ALLOC;
         goto cleanup_default;
     }
 
@@ -160,11 +173,11 @@ int lex(const char *path, dyn_buf_t *buf) {
     char *ident_buf;
     if ((ident_buf = calloc(1, MAX_VAR_LEN + 1)) == NULL) {
         res = ERR_MEM_ALLOC;
-        goto cleanup_fp;
+        goto cleanup_dyn_buf;
     }
 
     int ident_ind = 0;
-    while ((ch = fgetc(fp)) != EOF) {
+    while ((ch = fgetc(fp)) != eof) {
         if (isalnum(ch)) {
             ident_buf[ident_ind] = ch;
             ident_ind++;
@@ -180,22 +193,22 @@ int lex(const char *path, dyn_buf_t *buf) {
 
         if (ident_ind > 0) {
             ident_buf[ident_ind] = '\0';
-            _push_ident(buf, T_VAR, ident_buf) ;
+            _push_ident(*buf, T_VAR, ident_buf) ;
             ident_ind = 0;
         }
 
         switch (ch) {
             case ('('):
-                _push_sym(buf, T_LPAREN);
+                _push_sym(*buf, T_LPAREN);
                 break;
             case (')'):
-                _push_sym(buf, T_RPAREN);
+                _push_sym(*buf, T_RPAREN);
                 break;
             case ('.'):
-                _push_sym(buf, T_DOT);
+                _push_sym(*buf, T_DOT);
                 break;
             case ('\\'):
-                _push_sym(buf, T_BSLASH);
+                _push_sym(*buf, T_BSLASH);
                 break;
             case (' '):
             case ('\t'):
@@ -214,8 +227,9 @@ int lex(const char *path, dyn_buf_t *buf) {
 cleanup_buf:
     free(ident_buf);
 
-cleanup_fp:
-    fclose(fp);
+cleanup_dyn_buf:
+    if (res != 0)
+        dyn_buf_free(*buf, GET_VOID_FREE(free_token));
 
 cleanup_default:
     return res;

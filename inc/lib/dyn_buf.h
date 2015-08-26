@@ -15,6 +15,8 @@
  * @brief recast a void func(type *elem) to void _func(void *elem)
  */
 #define MAKE_VOID_FREE(n) void _##n(void *p) { n(p); }
+#define MAKE_VOID_FREE_DEF(n) void _##n(void *p);
+#define GET_VOID_FREE(n) _##n
 
 struct _dyn_buf;
 typedef struct _dyn_buf dyn_buf_t;

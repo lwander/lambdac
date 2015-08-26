@@ -9,6 +9,8 @@
 #ifndef _LEXER_H_
 #define _LEXER_H_
 
+#include <stdio.h>
+
 #include <lib/dyn_buf.h>
 
 #define MAX_VAR_LEN 64
@@ -35,8 +37,11 @@ typedef struct _token {
     char *ident;
 } token_t;
 
-int lex(const char *path, dyn_buf_t *buf);
+MAKE_VOID_FREE_DEF(free_token)
+
+int lex(FILE *fp, dyn_buf_t **buf, char eof);
 void format_tokens(dyn_buf_t *buf);
 void free_token(token_t *token);
+
 
 #endif /* _LEXER_H_ */

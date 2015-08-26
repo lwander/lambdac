@@ -23,7 +23,6 @@
 #include <string.h>
 #include <stdio.h>
 
-MAKE_VOID_FREE(free_token)
 int _parse_expr(dyn_buf_t *tokens, int *cur, htable_t *vars, expr_t **out);
 
 /**
@@ -305,18 +304,15 @@ success:
  *
  * @return 0 on success, ERR_* otherwise
  */
-int parse(const char *path, expr_t **ast) {
-    dyn_buf_t *tokens = dyn_buf_new();
+int parse(dyn_buf_t *tokens, expr_t **ast) {
+    if (dyn_buf_len(tokens) == 0)
+        return 0;
 
     int res;
-    if ((res = lex(path, tokens)) < 0)
-        goto cleanup_tokens;
-
-    format_tokens(tokens);
 
     htable_t *vars;
     if ((vars = htable_new()) == NULL)
-        goto cleanup_tokens;
+        return ERR_MEM_ALLOC;
 
     int cur = 0;
     if ((res = _parse_expr(tokens, &cur, vars, ast)) < 0)
@@ -329,13 +325,10 @@ int parse(const char *path, expr_t **ast) {
         goto cleanup_vars;
     }
 
-    res = 0;;
+    res = 0;
 
 cleanup_vars:
     htable_free(vars, NULL);
-
-cleanup_tokens:
-    dyn_buf_free(tokens, _free_token);
 
     return res;
 }
