@@ -188,29 +188,29 @@ void _format_expr(expr_t *expr);
  * @brief Format input variable 
  */
 void _format_var(var_t *var) {
-    printf("( [var] \"%s\".%d )", var->name, var->id);
+    printf("%s", var->name);
 }
 
 /**
  * @brief Format input lambda 
  */
 void _format_lam(lam_t *lam) {
-    printf("( [lam] \\");
+    printf("(\xCE\xBB");
     _format_var(lam->var);
-    printf(".");
+    printf(". ");
     _format_expr(lam->body);
-    printf(" )");
+    printf(")");
 }
 
 /**
  * @brief Format input application
  */
 void _format_appl(appl_t *appl) {
-    printf("( [appl] ");
+    printf("(");
     _format_expr(appl->f);
     printf(" ");
     _format_expr(appl->x);
-    printf(" )");
+    printf(")");
 }
 
 
@@ -218,7 +218,6 @@ void _format_appl(appl_t *appl) {
  * @brief Format input expression 
  */
 void _format_expr(expr_t *expr) {
-    printf("( [expr] ");
     switch (expr->type) {
         case (VAR):
             _format_var((var_t *)expr->data);
@@ -232,7 +231,6 @@ void _format_expr(expr_t *expr) {
         default:
             printf("??? %d", expr->type);
     }
-    printf(" )");
 }
 
 /**
@@ -246,3 +244,44 @@ void format_ast(expr_t *expr) {
     printf("\n");
 }
 
+/**
+ * @brief Make a deep var copy
+ */
+var_t *_deep_copy_var(var_t *var) {
+    return new_var(var->id, var->name);
+}
+
+/**
+ * @brief Make a deep lambda copy
+ */
+lam_t *_deep_copy_lam(lam_t *lam) {
+    return new_lam(_deep_copy_var(lam->var), deep_copy_expr(lam->body));
+}
+
+/**
+ * @brief Make a deep appl copy 
+ */
+appl_t *_deep_copy_appl(appl_t *appl) {
+    return new_appl(deep_copy_expr(appl->f), deep_copy_expr(appl->x));
+}
+
+/**
+ * @brief Make a deep expression copy
+ */
+expr_t *deep_copy_expr(expr_t *expr) {
+    void *data = NULL;
+    switch (expr->type) {
+        case (VAR):
+            data = _deep_copy_var((var_t *)expr->data);
+            break;
+        case (LAMBDA):
+            data = _deep_copy_lam((lam_t *)expr->data);
+            break;
+        case (APPL):
+            data = _deep_copy_appl((appl_t *)expr->data);
+            break;
+        default:
+            return NULL;
+    }
+    return new_expr(expr->type, data);
+}

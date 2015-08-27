@@ -64,6 +64,7 @@ var_t *new_var(unsigned int id, const char *name);
 expr_t *new_expr(expr_e type, void *data);
 lam_t *new_lam(var_t *var, expr_t *body);
 appl_t *new_appl(expr_t *f, expr_t *x);
+expr_t *deep_copy_expr(expr_t *e);
 void free_var(var_t *var);
 void free_expr(expr_t *expr);
 void free_lam(lam_t *lam);

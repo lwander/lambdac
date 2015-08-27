@@ -51,18 +51,21 @@ int main(int argc, char **argv) {
         dyn_buf_t *tokens;
         expr_t *ast;
         if ((res = lex(fp, &tokens, EOF)) < 0) {
-            printf("%s\n", err_to_string(res));
             goto cleanup_fp;
         } else if ((res = parse(tokens, &ast)) < 0) {
-            printf("%s\n", err_to_string(res));
             goto cleanup_tokens;
         } else {
 #ifdef _DEBUG_
+            /*
             format_tokens(tokens);
-            format_ast(ast);
+            format_ast(ast); */
 #endif /* _DEBUG_ */
-
         }
+
+        do {
+            printf("\x1B[34m-\033[0m ");
+            format_ast(ast);
+        } while (step_expr(ast) == 0);
 
         free_expr(ast);
 
@@ -74,13 +77,7 @@ cleanup_fp:
     }
 
     if (interp) {
-        while ((res = run_interp()) >= 0) {
-            /* user exited safely */
-            if (res > 0) {
-                res = 0;
-                break;
-            }
-        }
+        while ((res = run_interp()) != 1) { }
     }
 
 

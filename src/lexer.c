@@ -102,7 +102,6 @@ void format_tokens(dyn_buf_t *buf) {
     printf("\n");
 }
 
-
 /**
  * @brief Free input token
  *
@@ -177,7 +176,7 @@ int lex(FILE *fp, dyn_buf_t **buf, char eof) {
     }
 
     int ident_ind = 0;
-    while ((ch = fgetc(fp)) != eof) {
+    while ((ch = fgetc(fp)) != eof && ch != EOF) {
         if (isalnum(ch)) {
             ident_buf[ident_ind] = ch;
             ident_ind++;

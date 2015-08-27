@@ -83,8 +83,9 @@ int _parse_var(dyn_buf_t *tokens, int *cur, htable_t *vars,
     /* If a variable is not being bound anywhere, it is globally free and
      * we can't evaluate the program */
     if (!decl && !var_exists) {
-        err_set_msg(read.ident);
-        return ERR_UNBOUND_VAR;
+        res = ERR_UNBOUND_VAR;
+        err_report("Variable %s not bound", res, read.ident);
+        return res;
     }
 
     /* Generate a fresh "id" for the variable if this is the variable's
@@ -144,7 +145,8 @@ int _parse_lambda(dyn_buf_t *tokens, int *cur, htable_t *vars, lam_t **out) {
     /* <var> */
     var_t *var;
     if ((res = _parse_var(tokens, &_cur, vars, 1, &var)) < 0)
-        return ERR_BAD_PARSE;
+        return res;
+
     int old_var_id = res;
 
     /* . */
