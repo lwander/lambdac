@@ -1,6 +1,16 @@
 # Lambda Calculus Compiler in C 
 
-An attempt at writing a lambda calculus compiler in C for educational purposes. 
+An attempt at writing a lambda calculus compiler in C for educational purposes.
+
+___
+
+## Compilation
+
+
+```
+$ sudo apt-get install gcc-multilib # for <assert.h>
+$ make
+```
 
 ___
 
